@@ -1,9 +1,5 @@
-/**
- * Prints a Markdown table to the console.
- */
 export function printTable(title: string, headers: string[], data: Record<string, any>[]) {
-  console.log(`${title}`);
-  console.log('-'.repeat(title.length));
+  const tableContent = `${title}\n${'-'.repeat(title.length)}\n`;
 
   const colWidths = headers.map(h => {
     let max = h.length;
@@ -17,11 +13,12 @@ export function printTable(title: string, headers: string[], data: Record<string
   const headerLine = `| ${headers.map((h, i) => h.padEnd(colWidths[i])).join(' | ')} |`;
   const sepLine = `| ${colWidths.map(w => '-'.repeat(w)).join(' | ')} |`;
 
-  console.log(headerLine);
-  console.log(sepLine);
-
+  let rows = '';
   data.forEach(row => {
-    const rowLine = `| ${headers.map((h, i) => String(row[h] || '').padEnd(colWidths[i])).join(' | ')} |`;
-    console.log(rowLine);
+    rows += `| ${headers.map((h, i) => String(row[h] || '').padEnd(colWidths[i])).join(' | ')} |\n`;
   });
+
+  const fullTable = tableContent + headerLine + '\n' + sepLine + '\n' + rows;
+  console.log(fullTable);
+  return fullTable;
 }

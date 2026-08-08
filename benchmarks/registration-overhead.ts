@@ -40,7 +40,7 @@ function runDispatcherRegistrationOverhead(count: number): number | null {
   }
 }
 
-function runRegistrationBenchmark() {
+function runRegistrationOverheadBenchmark() {
   const counts = [1000, 10000];
 
   const results: Record<string, any>[] = [];
@@ -72,4 +72,8 @@ function runRegistrationBenchmark() {
   printTable('Registration Overhead Benchmark', ['Count', 'Dispatcher Avg', 'Native Avg'], results);
 }
 
-runRegistrationBenchmark();
+export { runRegistrationOverheadBenchmark };
+
+if (typeof process === 'object') {
+  runRegistrationOverheadBenchmark();
+}

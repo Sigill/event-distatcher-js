@@ -101,4 +101,8 @@ function runEmissionLatencyBenchmark() {
   printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'Native Latency (us)'], results);
 }
 
-runEmissionLatencyBenchmark();
+export { runEmissionLatencyBenchmark };
+
+if (typeof process === 'object') {
+  runEmissionLatencyBenchmark();
+}

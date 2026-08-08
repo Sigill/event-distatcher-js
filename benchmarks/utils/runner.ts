@@ -1,5 +1,3 @@
-import { performance } from 'node:perf_hooks';
-
 /**
  * Executes a given task and returns the time taken in milliseconds.
  */

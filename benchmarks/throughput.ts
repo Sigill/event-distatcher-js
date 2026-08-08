@@ -125,4 +125,8 @@ function runThroughputBenchmark() {
   printTable('Throughput Benchmark', ['Args', 'Volume', 'Dispatcher EPS', 'Native EPS'], results);
 }
 
-runThroughputBenchmark();
+export { runThroughputBenchmark };
+
+if (typeof process === 'object') {
+  runThroughputBenchmark();
+}
