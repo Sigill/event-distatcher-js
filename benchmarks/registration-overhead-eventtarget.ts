@@ -1,7 +1,7 @@
 import { measureAverage } from './utils/runner.ts';
 
 function runEventTargetRegistrationBenchmark() {
-  const counts = [10, 100, 500, 1000];
+  const counts = [1000, 10000];
 
   console.log('Starting EventTarget Registration Overhead Benchmark...');
   console.log(`Counts: ${counts.join(', ')}`);
