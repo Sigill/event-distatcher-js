@@ -2,24 +2,21 @@ import { measureAverage } from './utils/runner.ts';
 import { createMockPayload } from './data-factory.ts';
 
 function runEmissionLatencyBenchmark() {
+
   console.log('Starting Native Emission Latency Benchmark...');
   console.log('-'.repeat(40));
 
   const nativeTarget = new EventTarget();
 
-  let count = 0;
-  // Listeners
-  nativeTarget.addEventListener('event1', () => { count += 1; });
-  nativeTarget.addEventListener('event2', () => { count += 1; });
-  nativeTarget.addEventListener('event3', () => { count += 1; });
-
   const argCounts = [1, 3, 5];
 
-  for (const count of argCounts) {
-    console.log(`Arguments: ${count}`);
-    console.log('-'.repeat(20));
+  let callCount = 0; // Add a side effect to avoid potential optimizations that could skew the benchmark results.
+  // Listeners
+  nativeTarget.addEventListener('event1', () => { callCount++; });
+  nativeTarget.addEventListener('event2', () => { callCount++; });
+  nativeTarget.addEventListener('event3', () => { callCount++; });
 
-    // Prepare data - Using the same factory as the typed benchmark
+  for (const count of argCounts) {
     const payload = createMockPayload(1);
     const args = Array.from({ length: count }, () => payload);
 
@@ -33,10 +30,7 @@ function runEmissionLatencyBenchmark() {
       }
     }, 10);
 
-    // Divide by iterations to get average latency per single emission
-    console.log(`Native EventTarget: ${avgNative.toFixed(4)}ms`);
-
-    console.log('-'.repeat(20));
+    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgNative.toFixed(4)}ms`);
   }
 }
 

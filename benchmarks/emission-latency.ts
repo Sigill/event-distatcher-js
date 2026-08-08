@@ -14,19 +14,15 @@ function runEmissionLatencyBenchmark() {
 
   const dispatcher = new EventDispatcher<MyEvents>();
 
-  let count = 0;
-  // Listeners
-  dispatcher.addEventListener('event1', () => { count += 1; });
-  dispatcher.addEventListener('event2', () => { count += 1; });
-  dispatcher.addEventListener('event3', () => { count += 1; });
-
   const argCounts = [1, 3, 5];
 
-  for (const count of argCounts) {
-    console.log(`Arguments: ${count}`);
-    console.log('-'.repeat(20));
+  let callCount = 0; // Add a side effect to avoid potential optimizations that could skew the benchmark results.
+  // Listeners
+  dispatcher.addEventListener('event1', () => { callCount++; });
+  dispatcher.addEventListener('event2', () => { callCount++; });
+  dispatcher.addEventListener('event3', () => { callCount++; });
 
-    // Prepare data
+  for (const count of argCounts) {
     const payload = createMockPayload(1);
     const args = Array.from({ length: count }, () => payload);
 
@@ -40,10 +36,7 @@ function runEmissionLatencyBenchmark() {
       }
     }, 10);
 
-    // Divide by iterations to get average latency per single emission
-    console.log(`EventDispatcher: ${avgTyped.toFixed(4)}ms`);
-
-    console.log('-'.repeat(20));
+    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgTyped.toFixed(4)}ms`);
   }
 }
 

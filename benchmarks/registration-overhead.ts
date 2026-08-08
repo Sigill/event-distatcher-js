@@ -9,7 +9,6 @@ function runRegistrationBenchmark() {
   const counts = [1000, 10000];
 
   console.log('Starting Registration Overhead Benchmark...');
-  console.log(`Counts: ${counts.join(', ')}`);
   console.log('-'.repeat(40));
 
   for (const count of counts) {
