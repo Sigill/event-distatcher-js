@@ -14,12 +14,13 @@ function runEmissionLatencyBenchmark() {
 
   const dispatcher = new EventDispatcher<MyEvents>();
 
-  // Listeners (no-ops)
-  dispatcher.addEventListener('event1', () => {});
-  dispatcher.addEventListener('event2', () => {});
-  dispatcher.addEventListener('event3', () => {});
+  let count = 0;
+  // Listeners
+  dispatcher.addEventListener('event1', () => { count += 1; });
+  dispatcher.addEventListener('event2', () => { count += 1; });
+  dispatcher.addEventListener('event3', () => { count += 1; });
 
-  const argCounts = [1, 5, 10];
+  const argCounts = [1, 3, 5];
 
   for (const count of argCounts) {
     console.log(`Arguments: ${count}`);
@@ -27,10 +28,7 @@ function runEmissionLatencyBenchmark() {
 
     // Prepare data
     const payload = createMockPayload(1);
-    let args: any[] = [];
-    for (let i = 0; i < count; i++) {
-      args.push(payload);
-    }
+    const args = Array.from({ length: count }, () => payload);
 
     // Benchmark EventDispatcher by sending many events to reduce noise
     const iterations = 1000;

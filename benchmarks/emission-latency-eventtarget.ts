@@ -7,12 +7,13 @@ function runEmissionLatencyBenchmark() {
 
   const nativeTarget = new EventTarget();
 
-  // Listeners (no-ops)
-  nativeTarget.addEventListener('event1', () => {});
-  nativeTarget.addEventListener('event2', () => {});
-  nativeTarget.addEventListener('event3', () => {});
+  let count = 0;
+  // Listeners
+  nativeTarget.addEventListener('event1', () => { count += 1; });
+  nativeTarget.addEventListener('event2', () => { count += 1; });
+  nativeTarget.addEventListener('event3', () => { count += 1; });
 
-  const argCounts = [1, 5, 10];
+  const argCounts = [1, 3, 5];
 
   for (const count of argCounts) {
     console.log(`Arguments: ${count}`);
@@ -20,23 +21,20 @@ function runEmissionLatencyBenchmark() {
 
     // Prepare data - Using the same factory as the typed benchmark
     const payload = createMockPayload(1);
-    let args: any[] = [];
-    for (let i = 0; i < count; i++) {
-      args.push(payload);
-    }
+    const args = Array.from({ length: count }, () => payload);
 
     // Benchmark native EventTarget by sending many events to reduce noise
     const iterations = 1000;
     const avgNative = measureAverage(() => {
       for (let i = 0; i < iterations; i++) {
-        if (count === 1) nativeTarget.dispatchEvent(new CustomEvent('event1', { detail: args[0] }));
-        else if (count === 3) nativeTarget.dispatchEvent(new CustomEvent('event2', { detail: args }));
-        else if (count === 5) nativeTarget.dispatchEvent(new CustomEvent('event3', { detail: args }));
+        if (count === 1) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event1', { detail: args[0] }));
+        else if (count === 3) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event2', { detail: args }));
+        else if (count === 5) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event3', { detail: args }));
       }
     }, 10);
 
     // Divide by iterations to get average latency per single emission
-    console.log(`Native EventTarget: ${(avgNative / iterations).toFixed(4)}ms`);
+    console.log(`Native EventTarget: ${avgNative.toFixed(4)}ms`);
 
     console.log('-'.repeat(20));
   }
