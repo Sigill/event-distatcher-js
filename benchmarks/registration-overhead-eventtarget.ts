@@ -1,5 +1,4 @@
 import { measureAverage } from './utils/runner.ts';
-import { createMockPayloads } from './data-factory.ts';
 
 function runEventTargetRegistrationBenchmark() {
   const counts = [10, 100, 500, 1000];
@@ -15,10 +14,8 @@ function runEventTargetRegistrationBenchmark() {
       // Try to increase or remove the listener limit if available.
       target.setMaxListeners?.(0);
 
-      const payloads = createMockPayloads(count);
-
       // This is what we're benchmarking: the cost of registering many listeners on a native target.
-      for (const payload of payloads) {
+      for (let i = 0; i < count; i++) {
         target.addEventListener('message', () => {
           // No-op listener for registration overhead test
         });

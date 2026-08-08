@@ -1,6 +1,5 @@
 import { measureAverage } from './utils/runner.ts';
 import { EventDispatcher } from '../index.ts';
-import { createMockPayloads } from './data-factory.ts';
 
 type MyEvents = {
   message: [string];
@@ -16,10 +15,9 @@ function runRegistrationBenchmark() {
   for (const count of counts) {
     const task = () => {
       const dispatcher = new EventDispatcher<MyEvents>();
-      const payloads = createMockPayloads(count);
 
       // This is what we're benchmarking: the cost of registering many listeners on a single target.
-      for (const payload of payloads) {
+      for (let i = 0; i < count; i++) {
         dispatcher.addEventListener('message', () => {
           // No-op listener for registration overhead test
         });
