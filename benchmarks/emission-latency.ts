@@ -15,6 +15,7 @@ type MyEvents = {
 function runNativeLatency(count: number): number | null {
   try {
     const target = new EventTarget();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let callCount = 0;
     target.addEventListener('event1', () => { callCount++; });
     target.addEventListener('event2', () => { callCount++; });
@@ -44,6 +45,7 @@ function runNativeLatency(count: number): number | null {
 function runDispatcherLatency(count: number): number | null {
   try {
     const dispatcher = new EventDispatcher<MyEvents>();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let callCount = 0;
     dispatcher.addEventListener('event1', () => { callCount++; });
     dispatcher.addEventListener('event2', () => { callCount++; });

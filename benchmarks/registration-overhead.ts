@@ -9,6 +9,7 @@ function runNativeRegistrationOverhead(count: number): number | null {
   try {
     const task = () => {
       const target = new EventTarget();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       target.setMaxListeners?.(0);
       for (let i = 0; i < count; i++) {
         target.addEventListener('message', () => {});
