@@ -1,6 +1,6 @@
-import { measureAverage } from './utils/runner.js';
-import { EventDispatcher } from '../index.js';
-import { createMockPayloads } from './data-factory.js';
+import { measureAverage } from './utils/runner.ts';
+import { EventDispatcher } from '../index.ts';
+import { createMockPayloads } from './data-factory.ts';
 
 type MyEvents = {
   message: [string];
