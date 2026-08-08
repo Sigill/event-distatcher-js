@@ -1,0 +1,29 @@
+{
+  "name": "@sigill/event-dispatcher",
+  "version": "1.0.0",
+  "description": "A library providing strongly-typed event handling and EventTarget definitions.",
+  "license": "ISC",
+  "author": "Cyrille FAUCHEUX",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": "./dist/index.js",
+  "scripts": {
+    "build": "node node_modules/typescript-7/bin/tsc",
+    "lint": "eslint index.ts"
+  },
+  "files": [
+    "index.ts",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/index.js.map"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.4.0",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^10.2.1",
+    "typescript": "^6.0.3",
+    "typescript-7": "npm:typescript@^7.0.2",
+    "typescript-eslint": "^8.35.0"
+  }
+}
