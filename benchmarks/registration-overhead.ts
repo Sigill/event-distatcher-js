@@ -6,7 +6,7 @@ type MyEvents = {
   message: [string];
 };
 
-async function runRegistrationBenchmark() {
+function runRegistrationBenchmark() {
   const counts = [10, 100, 500, 1000];
 
   console.log('Starting Registration Overhead Benchmark...');
@@ -14,7 +14,7 @@ async function runRegistrationBenchmark() {
   console.log('-'.repeat(40));
 
   for (const count of counts) {
-    const task = async () => {
+    const task = () => {
       const dispatcher = new EventDispatcher<MyEvents>();
       const payloads = createMockPayloads(count);
 
@@ -26,9 +26,9 @@ async function runRegistrationBenchmark() {
       }
     };
 
-    const { avgDuration } = await measureAverage(task, 5);
+    const avgDuration = measureAverage(task, 5);
     console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgDuration.toFixed(4)}ms`);
   }
 }
 
-runRegistrationBenchmark().catch(console.error);
+runRegistrationBenchmark();

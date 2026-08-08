@@ -1,7 +1,7 @@
 import { measureAverage } from './utils/runner.ts';
 import { createMockPayloads } from './data-factory.ts';
 
-async function runEventTargetRegistrationBenchmark() {
+function runEventTargetRegistrationBenchmark() {
   const counts = [10, 100, 500, 1000];
 
   console.log('Starting EventTarget Registration Overhead Benchmark...');
@@ -9,11 +9,11 @@ async function runEventTargetRegistrationBenchmark() {
   console.log('-'.repeat(40));
 
   for (const count of counts) {
-    const task = async () => {
+    const task = () => {
       const target = new EventTarget();
 
       // Try to increase or remove the listener limit if available.
-      e.setMaxListeners?.(0);
+      target.setMaxListeners?.(0);
 
       const payloads = createMockPayloads(count);
 
@@ -25,9 +25,9 @@ async function runEventTargetRegistrationBenchmark() {
       }
     };
 
-    const { avgDuration } = await measureAverage(task, 5);
+    const avgDuration = measureAverage(task, 5);
     console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgDuration.toFixed(4)}ms`);
   }
 }
 
-runEventTargetRegistrationBenchmark().catch(console.error);
+runEventTargetRegistrationBenchmark();
