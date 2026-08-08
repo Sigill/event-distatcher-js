@@ -26,17 +26,16 @@ function runEmissionLatencyBenchmark() {
     const payload = createMockPayload(1);
     const args = Array.from({ length: count }, () => payload);
 
-    // Benchmark EventDispatcher by sending many events to reduce noise
-    const iterations = 1000;
-    const avgTyped = measureAverage(() => {
-      for (let i = 0; i < iterations; i++) {
-        if (count === 1) dispatcher.dispatchEvent('event1', ...args);
-        else if (count === 3) dispatcher.dispatchEvent('event2', ...args);
-        else if (count === 5) dispatcher.dispatchEvent('event3', ...args);
-      }
-    }, 10);
+    let measureMs = 0;
+    if (count === 1) {
+      measureMs = measureAverage(() => dispatcher.dispatchEvent('event1', ...args), 1000);
+    } else if (count === 3) {
+      measureMs = measureAverage(() => dispatcher.dispatchEvent('event2', ...args), 1000);
+    } else if (count === 5) {
+      measureMs = measureAverage(() => dispatcher.dispatchEvent('event3', ...args), 1000);
+    }
 
-    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgTyped.toFixed(4)}ms`);
+    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${(measureMs * 1000).toFixed(3)}us`);
   }
 }
 

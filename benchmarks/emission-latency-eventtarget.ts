@@ -20,17 +20,16 @@ function runEmissionLatencyBenchmark() {
     const payload = createMockPayload(1);
     const args = Array.from({ length: count }, () => payload);
 
-    // Benchmark native EventTarget by sending many events to reduce noise
-    const iterations = 1000;
-    const avgNative = measureAverage(() => {
-      for (let i = 0; i < iterations; i++) {
-        if (count === 1) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event1', { detail: args[0] }));
-        else if (count === 3) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event2', { detail: args }));
-        else if (count === 5) nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event3', { detail: args }));
-      }
-    }, 10);
+    let measureMs = 0;
+    if (count === 1) {
+      measureMs = measureAverage(() => nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event1', { detail: args[0] })), 1000);
+    } else if (count === 3) {
+      measureMs = measureAverage(() => nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event2', { detail: args })), 1000);
+    } else if (count === 5) {
+      measureMs = measureAverage(() => nativeTarget.dispatchEvent(new CustomEvent<Record<string, any>>('event3', { detail: args })), 1000);
+    }
 
-    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgNative.toFixed(4)}ms`);
+    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${(measureMs * 1000).toFixed(3)}us`);
   }
 }
 
