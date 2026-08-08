@@ -3,11 +3,12 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
+import pluginVitest from '@vitest/eslint-plugin'
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
   {
-    files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+    files: ["**/*.ts"],
     plugins: {
       "@typescript-eslint": tseslint.plugin,
       "@stylistic": stylistic,
@@ -59,12 +60,7 @@ export default defineConfig(
     },
   },
   {
-    files: ["**/*.test.ts"],
-    plugins: {
-      "@typescript-eslint": tseslint.plugin,
-    },
-    rules: {
-      "@typescript-eslint/no-unused-expressions": "off", // Otherwise expect(something).to.exist is considered as an unused expression.
-    }
+    files: ["index.test.ts"],
+    ...pluginVitest.configs.recommended,
   },
 );

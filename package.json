@@ -9,7 +9,10 @@
   "exports": "./dist/index.js",
   "scripts": {
     "build": "node node_modules/typescript-7/bin/tsc",
-    "lint": "eslint index.ts"
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "node node_modules/typescript-7/bin/tsc -p tsconfig.test.json --noEmit"
   },
   "files": [
     "index.ts",
@@ -21,9 +24,11 @@
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.4.0",
     "@types/eslint__js": "^8.42.3",
+    "@vitest/eslint-plugin": "^1.6.26",
     "eslint": "^10.2.1",
     "typescript": "^6.0.3",
     "typescript-7": "npm:typescript@^7.0.2",
-    "typescript-eslint": "^8.35.0"
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^4.1.10"
   }
 }

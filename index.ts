@@ -15,10 +15,10 @@ export type EventListener<Data extends Array<unknown>> = (...data: Data) => void
  *
  * @example
  * ```typescript
- * interface Events {
+ * type Events = {
  *   'event1': [string];
  *   'event2': [number, string];
- * }
+ * };
  *
  * const dispatcher = new EventDispatcher<Events>();
  *
