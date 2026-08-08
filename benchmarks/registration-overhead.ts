@@ -1,31 +1,74 @@
 import { measureAverage } from './utils/runner.ts';
 import { EventDispatcher } from '../index.ts';
+import { printTable } from './utils/reporter.ts';
 
-type MyEvents = {
-  message: [string];
-};
+/**
+ * Adapter for the native EventTarget implementation registration overhead.
+ */
+function runNativeRegistrationOverhead(count: number): number | null {
+  try {
+    const task = () => {
+      const target = new EventTarget();
+      target.setMaxListeners?.(0);
+      for (let i = 0; i < count; i++) {
+        target.addEventListener('message', () => {});
+      }
+    };
+
+    return measureAverage(task, 5);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Adapter for the Typed EventDispatcher implementation registration overhead.
+ */
+function runDispatcherRegistrationOverhead(count: number): number | null {
+  try {
+    const task = () => {
+      const dispatcher = new EventDispatcher<{ message: [string] }>();
+      for (let i = 0; i < count; i++) {
+        dispatcher.addEventListener('message', () => {});
+      }
+    };
+
+    return measureAverage(task, 5);
+  } catch {
+    return null;
+  }
+}
 
 function runRegistrationBenchmark() {
   const counts = [1000, 10000];
 
-  console.log('Starting Registration Overhead Benchmark...');
-  console.log('-'.repeat(40));
+  const results: Record<string, any>[] = [];
 
   for (const count of counts) {
-    const task = () => {
-      const dispatcher = new EventDispatcher<MyEvents>();
+    const dispatcherAvg = runDispatcherRegistrationOverhead(count);
+    const nativeAvg = runNativeRegistrationOverhead(count);
 
-      // This is what we're benchmarking: the cost of registering many listeners on a single target.
-      for (let i = 0; i < count; i++) {
-        dispatcher.addEventListener('message', () => {
-          // No-op listener for registration overhead test
-        });
-      }
+    let dispatcherStr = 'N/A';
+    if (dispatcherAvg !== null) {
+      dispatcherStr = `${dispatcherAvg.toFixed(4)}ms`;
+    }
+
+    let nativeStr = 'N/A';
+    if (nativeAvg !== null) {
+      const relative = dispatcherAvg !== null ? Math.round((nativeAvg / dispatcherAvg) * 100) : null;
+      nativeStr = `${nativeAvg.toFixed(4)}ms (${relative !== null ? relative + '%' : 'N/A'})`;
+    }
+
+    const results_row = {
+      'Count': count.toString(),
+      'Dispatcher Avg': dispatcherStr,
+      'Native Avg': nativeStr,
     };
 
-    const avgDuration = measureAverage(task, 5);
-    console.log(`Count: ${count.toString().padEnd(6)} | Avg Duration: ${avgDuration.toFixed(4)}ms`);
+    results.push(results_row);
   }
+
+  printTable('Registration Overhead Benchmark', ['Count', 'Dispatcher Avg', 'Native Avg'], results);
 }
 
 runRegistrationBenchmark();
