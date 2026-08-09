@@ -10,9 +10,9 @@ type MyEvents = {
 };
 
 /**
- * Adapter for the native EventTarget implementation.
+ * Adapter for the EventTarget implementation.
  */
-function runNativeLatency(count: number): number | null {
+function runEventTargetLatency(count: number): number | null {
   try {
     const target = new EventTarget();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,29 +76,29 @@ function runEmissionLatencyBenchmark() {
 
   for (const count of argCounts) {
     const dispatcherMs = runDispatcherLatency(count);
-    const nativeMs = runNativeLatency(count);
+    const eventTargetMs = runEventTargetLatency(count);
 
     let dispatcherStr = 'N/A';
     if (dispatcherMs !== null) {
       dispatcherStr = `${(dispatcherMs * 1000).toFixed(3)}us`;
     }
 
-    let nativeStr = 'N/A';
-    if (nativeMs !== null) {
-      const relative = dispatcherMs !== null ? Math.round((nativeMs / dispatcherMs) * 100) : null;
-      nativeStr = `${(nativeMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
+    let eventTargetStr = 'N/A';
+    if (eventTargetMs !== null) {
+      const relative = dispatcherMs !== null ? Math.round((eventTargetMs / dispatcherMs) * 100) : null;
+      eventTargetStr = `${(eventTargetMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
     }
 
     const results_row = {
       'Count': count.toString(),
       'Dispatcher Latency (us)': dispatcherStr,
-      'Native Latency (us)': nativeStr,
+      'EventTarget Latency (us)': eventTargetStr,
     };
 
     results.push(results_row);
   }
 
-  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'Native Latency (us)'], results);
+  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'EventTarget Latency (us)'], results);
 }
 
 export { runEmissionLatencyBenchmark };

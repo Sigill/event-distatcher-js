@@ -3,9 +3,9 @@ import { EventDispatcher } from '../index.ts';
 import { printTable } from './utils/reporter.ts';
 
 /**
- * Adapter for the native EventTarget implementation registration overhead.
+ * Adapter for the EventTarget implementation registration overhead.
  */
-function runNativeRegistrationOverhead(count: number): number | null {
+function runEventTargetRegistrationOverhead(count: number): number | null {
   try {
     const task = () => {
       const target = new EventTarget();
@@ -47,29 +47,29 @@ function runRegistrationOverheadBenchmark() {
 
   for (const count of counts) {
     const dispatcherAvg = runDispatcherRegistrationOverhead(count);
-    const nativeAvg = runNativeRegistrationOverhead(count);
+    const eventTargetAvg = runEventTargetRegistrationOverhead(count);
 
     let dispatcherStr = 'N/A';
     if (dispatcherAvg !== null) {
       dispatcherStr = `${dispatcherAvg.toFixed(4)}ms`;
     }
 
-    let nativeStr = 'N/A';
-    if (nativeAvg !== null) {
-      const relative = dispatcherAvg !== null ? Math.round((nativeAvg / dispatcherAvg) * 100) : null;
-      nativeStr = `${nativeAvg.toFixed(4)}ms (${relative !== null ? relative + '%' : 'N/A'})`;
+    let eventTargetStr = 'N/A';
+    if (eventTargetAvg !== null) {
+      const relative = dispatcherAvg !== null ? Math.round((eventTargetAvg / dispatcherAvg) * 100) : null;
+      eventTargetStr = `${eventTargetAvg.toFixed(4)}ms (${relative !== null ? relative + '%' : 'N/A'})`;
     }
 
     const results_row = {
       'Count': count.toString(),
       'Dispatcher Avg': dispatcherStr,
-      'Native Avg': nativeStr,
+      'EventTarget Avg': eventTargetStr,
     };
 
     results.push(results_row);
   }
 
-  printTable('Registration Overhead Benchmark', ['Count', 'Dispatcher Avg', 'Native Avg'], results);
+  printTable('Registration Overhead Benchmark', ['Count', 'Dispatcher Avg', 'EventTarget Avg'], results);
 }
 
 export { runRegistrationOverheadBenchmark };

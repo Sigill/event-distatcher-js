@@ -10,9 +10,9 @@ type MyEvents = {
 };
 
 /**
- * Adapter for the native EventTarget implementation.
+ * Adapter for the EventTarget implementation.
  */
-function runNativeThroughput(count: number, volume: number): number | null {
+function runEventTargetThroughput(count: number, volume: number): number | null {
   try {
     const target = new EventTarget();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,10 +89,10 @@ function runThroughputBenchmark() {
 
   for (const count of argCounts) {
     for (const volume of volumes) {
-      const nativeDuration = runNativeThroughput(count, volume);
+      const eventTargetDuration = runEventTargetThroughput(count, volume);
       const dispatcherDuration = runDispatcherThroughput(count, volume);
 
-      const nativeEps = nativeDuration !== null ? (volume / nativeDuration) * 1000 : null;
+      const eventTargetEps = eventTargetDuration !== null ? (volume / eventTargetDuration) * 1000 : null;
       const dispatcherEps = dispatcherDuration !== null ? (volume / dispatcherDuration) * 1000 : null;
 
       let dispatcherRefEps: number | null = null;
@@ -105,24 +105,24 @@ function runThroughputBenchmark() {
         dispatcherStr = dispatcherEps.toFixed(0);
       }
 
-      let nativeStr = 'N/A';
-      if (nativeEps !== null) {
-        const relative = dispatcherRefEps !== null ? Math.round((nativeEps / dispatcherRefEps) * 100) : null;
-        nativeStr = `${nativeEps.toFixed(0)} (${relative !== null ? relative + '%' : 'N/A'})`;
+      let eventTargetStr = 'N/A';
+      if (eventTargetEps !== null) {
+        const relative = dispatcherRefEps !== null ? Math.round((eventTargetEps / dispatcherRefEps) * 100) : null;
+        eventTargetStr = `${eventTargetEps.toFixed(0)} (${relative !== null ? relative + '%' : 'N/A'})`;
       }
 
       const results_row = {
         'Args': count.toString(),
         'Volume': volume.toString(),
         'Dispatcher EPS': dispatcherStr,
-        'Native EPS': nativeStr,
+        'EventTarget EPS': eventTargetStr,
       };
 
       results.push(results_row);
     }
   }
 
-  printTable('Throughput Benchmark', ['Args', 'Volume', 'Dispatcher EPS', 'Native EPS'], results);
+  printTable('Throughput Benchmark', ['Args', 'Volume', 'Dispatcher EPS', 'EventTarget EPS'], results);
 }
 
 export { runThroughputBenchmark };
