@@ -2,6 +2,7 @@ import { printTable } from '../../utils/reporter.ts';
 import { runEventTargetLatency } from './event-target.ts';
 import { runDispatcherLatency } from './dispatcher.ts';
 import { runTinyTypedEmitterLatency } from './tiny-emitter.ts';
+import { runStrictEmitterLatency } from './strict-emitter.ts';
 
 export function runEmissionLatencyBenchmark() {
   const argCounts = [1, 3, 5];
@@ -12,6 +13,7 @@ export function runEmissionLatencyBenchmark() {
     const dispatcherMs = runDispatcherLatency(count);
     const eventTargetMs = runEventTargetLatency(count);
     const tinyEmitterMs = runTinyTypedEmitterLatency(count);
+    const strictEmitterMs = runStrictEmitterLatency(count);
 
     let dispatcherStr = 'N/A';
     if (dispatcherMs !== null) {
@@ -30,17 +32,24 @@ export function runEmissionLatencyBenchmark() {
       tinyEmitterStr = `${(tinyEmitterMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
     }
 
+    let strictEmitterStr = 'N/A';
+    if (strictEmitterMs !== null) {
+      const relative = dispatcherMs !== null ? Math.round((strictEmitterMs / dispatcherMs) * 100) : null;
+      strictEmitterStr = `${(strictEmitterMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
+    }
+
     const results_row = {
       'Count': count.toString(),
       'Dispatcher Latency (us)': dispatcherStr,
       'EventTarget Latency (us)': eventTargetStr,
       'TinyEmitter Latency (us)': tinyEmitterStr,
+      'StrictEmitter Latency (us)': strictEmitterStr,
     };
 
     results.push(results_row);
   }
 
-  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'EventTarget Latency (us)', 'TinyEmitter Latency (us)'], results);
+  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'EventTarget Latency (us)', 'TinyEmitter Latency (us)', 'StrictEmitter Latency (us)'], results);
 }
 
 if (typeof process === 'object') {
