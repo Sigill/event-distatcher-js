@@ -1,11 +1,10 @@
 import { measure } from '../../utils/runner.ts';
 import { EventDispatcher } from '../../../index.ts';
-import { createMockPayload } from '../../utils/data-factory.ts';
 
 type MyEvents = {
-  event1: [Record<string, any>];
-  event2: [Record<string, any>, Record<string, any>, Record<string, any>];
-  event3: [Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>];
+  event1: [string];
+  event2: [string, string, string];
+  event3: [string, string, string, string, string];
 };
 
 /**
@@ -20,21 +19,20 @@ export function runDispatcherThroughput(count: number, volume: number): number |
     dispatcher.addEventListener('event2', () => { callCount++; });
     dispatcher.addEventListener('event3', () => { callCount++; });
 
-    const payload = createMockPayload(1);
-    const args = Array.from({ length: count }, () => payload);
+    const payload = 'benchmark';
 
     let durationMs = 0;
     if (count === 1) {
       durationMs = measure(() => {
-        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event1', ...args);
+        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event1', payload);
       });
     } else if (count === 3) {
       durationMs = measure(() => {
-        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event2', ...args);
+        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event2', payload, payload, payload);
       });
     } else if (count === 5) {
       durationMs = measure(() => {
-        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event3', ...args);
+        for (let i = 0; i < volume; i++) dispatcher.dispatchEvent('event3', payload, payload, payload, payload, payload);
       });
     }
 

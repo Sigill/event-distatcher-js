@@ -8,12 +8,13 @@
   "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",
   "scripts": {
-    "build": "node node_modules/typescript-7/bin/tsc",
-    "build:benchmark": "npx esbuild benchmarks/benchmark-entry.ts --bundle --outfile=benchmarks/dist/benchmark.js --platform=browser --sourcemap=inline --servedir=benchmarks",
+    "build": "node node_modules/typescript-7/bin/tsc -p tsconfig.build.json",
+    "build:benchmark": "esbuild benchmarks/benchmark-entry.ts --bundle --outfile=benchmarks/dist/benchmark.js --platform=browser --sourcemap=inline --alias:events=./benchmarks/utils/events-stub.ts --servedir=benchmarks",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "typecheck": "node node_modules/typescript-7/bin/tsc -p tsconfig.test.json --noEmit"
+    "typecheck": "node node_modules/typescript-7/bin/tsc --noEmit",
+    "typecheck:watch": "node node_modules/typescript-7/bin/tsc --noEmit --watch"
   },
   "files": [
     "index.ts",

@@ -8,6 +8,9 @@ import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
   {
+    ignores: ["dist/**", "benchmarks/dist/**"],
+  },
+  {
     files: ["**/*.ts"],
     plugins: {
       "@typescript-eslint": tseslint.plugin,

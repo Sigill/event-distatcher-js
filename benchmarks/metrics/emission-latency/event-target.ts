@@ -1,5 +1,4 @@
 import { measureAverage } from '../../utils/runner.ts';
-import { createMockPayload } from '../../utils/data-factory.ts';
 
 /**
  * Adapter for the EventTarget implementation.
@@ -13,16 +12,21 @@ export function runEventTargetLatency(count: number): number | null {
     target.addEventListener('event2', () => { callCount++; });
     target.addEventListener('event3', () => { callCount++; });
 
-    const payload = createMockPayload(1);
-    const args = Array.from({ length: count }, () => payload);
+    const payload = 'benchmark';
 
     let measureMs = 0;
     if (count === 1) {
-      measureMs = measureAverage(() => target.dispatchEvent(new CustomEvent<Record<string, any>>('event1', { detail: args[0] })), 1000);
+      measureMs = measureAverage(() => {
+        target.dispatchEvent(new CustomEvent<string>('event1', { detail: payload }));
+      }, 1000);
     } else if (count === 3) {
-      measureMs = measureAverage(() => target.dispatchEvent(new CustomEvent<Record<string, any>>('event2', { detail: args })), 1000);
+      measureMs = measureAverage(() => {
+        target.dispatchEvent(new CustomEvent<[string, string, string]>('event2', { detail: [payload, payload, payload] }));
+      }, 1000);
     } else if (count === 5) {
-      measureMs = measureAverage(() => target.dispatchEvent(new CustomEvent<Record<string, any>>('event3', { detail: args })), 1000);
+      measureMs = measureAverage(() => {
+        target.dispatchEvent(new CustomEvent<[string, string, string, string, string]>('event3', { detail: [payload, payload, payload, payload, payload] }));
+      }, 1000);
     }
 
     return measureMs;

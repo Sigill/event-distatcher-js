@@ -1,9 +1,8 @@
 import { measureAverage } from '../../utils/runner.ts';
-import { createMockPayload } from '../../utils/data-factory.ts';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 type MyEvents = {
-  message: [string];
+  message: [];
 };
 
 /**
@@ -17,6 +16,9 @@ type MyEmitterEvents = {
  * Adapter for the tiny-typed-emitter implementation registration overhead.
  */
 export function runTinyTypedEmitterRegistrationOverhead(count: number): number | null {
+  if (typeof window !== 'undefined' || typeof process === 'undefined' || !process.versions?.node) {
+    return null;
+  }
   try {
     const task = () => {
       const emitter = new TypedEmitter<MyEmitterEvents>();

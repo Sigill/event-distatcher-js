@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { EventDispatcher } from './index';
+import { EventDispatcher } from './index.ts';
 
 type MyEvents = {
   'test-event': [string];
