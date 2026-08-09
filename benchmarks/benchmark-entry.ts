@@ -1,6 +1,6 @@
-import { runThroughputBenchmark } from './throughput.ts';
-import { runRegistrationOverheadBenchmark } from './registration-overhead.ts';
-import { runEmissionLatencyBenchmark } from './emission-latency.ts';
+import { runThroughputBenchmark } from './metrics/throughput/index.ts';
+import { runRegistrationOverheadBenchmark } from './metrics/registration-overhead/index.ts';
+import { runEmissionLatencyBenchmark } from './metrics/emission-latency/index.ts';
 
 console.log('Starting Benchmark Suite...');
 
