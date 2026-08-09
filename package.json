@@ -17,10 +17,10 @@
     "typecheck:watch": "node node_modules/typescript-7/bin/tsc --noEmit --watch"
   },
   "files": [
-    "index.ts",
     "dist/index.js",
+    "dist/index.js.map",
     "dist/index.d.ts",
-    "dist/index.js.map"
+    "dist/index.d.ts.map"
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
