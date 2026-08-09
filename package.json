@@ -9,6 +9,7 @@
   "exports": "./dist/index.js",
   "scripts": {
     "build": "node node_modules/typescript-7/bin/tsc",
+    "build:benchmark": "npx esbuild benchmarks/benchmark-entry.ts --bundle --outfile=benchmarks/dist/benchmark.js --platform=browser --sourcemap=inline --servedir=benchmarks",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
