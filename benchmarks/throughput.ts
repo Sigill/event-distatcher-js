@@ -2,6 +2,7 @@ import { measure } from './utils/runner.ts';
 import { EventDispatcher } from '../index.ts';
 import { createMockPayload } from './data-factory.ts';
 import { printTable } from './utils/reporter.ts';
+import { TypedEmitter } from 'tiny-typed-emitter';
 
 type MyEvents = {
   event1: [Record<string, any>];
@@ -81,6 +82,49 @@ function runDispatcherThroughput(count: number, volume: number): number | null {
   }
 }
 
+/**
+ * For tiny-typed-emitter we map the tuples to function signatures.
+ */
+type MyEmitterEvents = {
+  [K in keyof MyEvents]: (args: MyEvents[K]) => void;
+};
+
+/**
+ * Adapter for the tiny-typed-emitter implementation.
+ */
+function runTinyTypedEmitterThroughput(count: number, volume: number): number | null {
+  try {
+    const emitter = new TypedEmitter<MyEmitterEvents>();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let callCount = 0;
+    emitter.on('event1', () => { callCount++; });
+    emitter.on('event2', () => { callCount++; });
+    emitter.on('event3', () => { callCount++; });
+
+    const payload = createMockPayload(1);
+    const args = Array.from({ length: count }, () => payload);
+
+    let durationMs = 0;
+    if (count === 1) {
+      durationMs = measure(() => {
+        for (let i = 0; i < volume; i++) emitter.emit('event1', args[0]);
+      });
+    } else if (count === 3) {
+      durationMs = measure(() => {
+        for (let i = 0; i < volume; i++) emitter.emit('event2', ...args);
+      });
+    } else if (count === 5) {
+      durationMs = measure(() => {
+        for (let i = 0; i < volume; i++) emitter.emit('event3', ...args);
+      });
+    }
+
+    return durationMs;
+  } catch {
+    return null;
+  }
+}
+
 function runThroughputBenchmark() {
   const argCounts = [1, 3, 5];
   const volumes = [10_000, 50_000, 100_000];
@@ -90,10 +134,12 @@ function runThroughputBenchmark() {
   for (const count of argCounts) {
     for (const volume of volumes) {
       const eventTargetDuration = runEventTargetThroughput(count, volume);
+      const tinyEmitterDuration = runTinyTypedEmitterThroughput(count, volume);
       const dispatcherDuration = runDispatcherThroughput(count, volume);
 
-      const eventTargetEps = eventTargetDuration !== null ? (volume / eventTargetDuration) * 1000 : null;
       const dispatcherEps = dispatcherDuration !== null ? (volume / dispatcherDuration) * 1000 : null;
+      const eventTargetEps = eventTargetDuration !== null ? (volume / eventTargetDuration) * 1000 : null;
+      const tinyEmitterEps = tinyEmitterDuration !== null ? (volume / tinyEmitterDuration) * 1000 : null;
 
       let dispatcherRefEps: number | null = null;
       if (dispatcherDuration !== null) {
@@ -107,8 +153,14 @@ function runThroughputBenchmark() {
 
       let eventTargetStr = 'N/A';
       if (eventTargetEps !== null) {
-        const relative = dispatcherRefEps !== null ? Math.round((eventTargetEps / dispatcherRefEps) * 100) : null;
-        eventTargetStr = `${eventTargetEps.toFixed(0)} (${relative !== null ? relative + '%' : 'N/A'})`;
+        const relativeToDispatcher = dispatcherRefEps !== null ? Math.round((eventTargetEps / dispatcherRefEps) * 100) : null;
+        eventTargetStr = `${eventTargetEps.toFixed(0)} (${relativeToDispatcher !== null ? relativeToDispatcher + '%' : 'N/A'})`;
+      }
+
+      let tinyEmitterStr = 'N/A';
+      if (tinyEmitterEps !== null) {
+        const relativeToDispatcher = dispatcherRefEps !== null ? Math.round((tinyEmitterEps / dispatcherRefEps) * 100) : null;
+        tinyEmitterStr = `${tinyEmitterEps.toFixed(0)} (${relativeToDispatcher !== null ? relativeToDispatcher + '%' : 'N/A'})`;
       }
 
       const results_row = {
@@ -116,13 +168,14 @@ function runThroughputBenchmark() {
         'Volume': volume.toString(),
         'Dispatcher EPS': dispatcherStr,
         'EventTarget EPS': eventTargetStr,
+        'TinyEmitter EPS': tinyEmitterStr,
       };
 
       results.push(results_row);
     }
   }
 
-  printTable('Throughput Benchmark', ['Args', 'Volume', 'Dispatcher EPS', 'EventTarget EPS'], results);
+  printTable('Throughput Benchmark', ['Args', 'Volume', 'Dispatcher EPS', 'EventTarget EPS', 'TinyEmitter EPS'], results);
 }
 
 export { runThroughputBenchmark };

@@ -29,6 +29,7 @@
     "@vitest/eslint-plugin": "^1.6.26",
     "esbuild": "^0.28.2",
     "eslint": "^10.2.1",
+    "tiny-typed-emitter": "^2.1.0",
     "typescript": "^6.0.3",
     "typescript-7": "npm:typescript@^7.0.2",
     "typescript-eslint": "^8.35.0",

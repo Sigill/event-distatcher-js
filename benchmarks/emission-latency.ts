@@ -2,11 +2,19 @@ import { measureAverage } from './utils/runner.ts';
 import { EventDispatcher } from '../index.ts';
 import { createMockPayload } from './data-factory.ts';
 import { printTable } from './utils/reporter.ts';
+import { TypedEmitter } from 'tiny-typed-emitter';
 
 type MyEvents = {
   event1: [Record<string, any>];                     // 1 argument
   event2: [Record<string, any>, Record<string, any>, Record<string, any>]; // 3 arguments
   event3: [Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>]; // 5 arguments
+};
+
+/**
+ * For tiny-typed-emitter we map the tuples to function signatures.
+ */
+type MyEmitterEvents = {
+  [K in keyof MyEvents]: (args: MyEvents[K]) => void;
 };
 
 /**
@@ -69,6 +77,36 @@ function runDispatcherLatency(count: number): number | null {
   }
 }
 
+/**
+ * Adapter for the tiny-typed-emitter implementation.
+ */
+function runTinyTypedEmitterLatency(count: number): number | null {
+  try {
+    const emitter = new TypedEmitter<MyEmitterEvents>();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let callCount = 0;
+    emitter.on('event1', () => { callCount++; });
+    emitter.on('event2', () => { callCount++; });
+    emitter.on('event3', () => { callCount++; });
+
+    const payload = createMockPayload(1);
+    const args = Array.from({ length: count }, () => payload);
+
+    let measureMs = 0;
+    if (count === 1) {
+      measureMs = measureAverage(() => emitter.emit('event1', args[0]), 1000);
+    } else if (count === 3) {
+      measureMs = measureAverage(() => emitter.emit('event2', ...args), 1000);
+    } else if (count === 5) {
+      measureMs = measureAverage(() => emitter.emit('event3', ...args), 1000);
+    }
+
+    return measureMs;
+  } catch {
+    return null;
+  }
+}
+
 function runEmissionLatencyBenchmark() {
   const argCounts = [1, 3, 5];
 
@@ -76,6 +114,7 @@ function runEmissionLatencyBenchmark() {
 
   for (const count of argCounts) {
     const dispatcherMs = runDispatcherLatency(count);
+    const tinyEmitterMs = runTinyTypedEmitterLatency(count);
     const eventTargetMs = runEventTargetLatency(count);
 
     let dispatcherStr = 'N/A';
@@ -89,16 +128,23 @@ function runEmissionLatencyBenchmark() {
       eventTargetStr = `${(eventTargetMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
     }
 
+    let tinyEmitterStr = 'N/A';
+    if (tinyEmitterMs !== null) {
+      const relative = dispatcherMs !== null ? Math.round((tinyEmitterMs / dispatcherMs) * 100) : null;
+      tinyEmitterStr = `${(tinyEmitterMs * 1000).toFixed(3)}us (${relative !== null ? relative + '%' : 'N/A'})`;
+    }
+
     const results_row = {
       'Count': count.toString(),
       'Dispatcher Latency (us)': dispatcherStr,
       'EventTarget Latency (us)': eventTargetStr,
+      'TinyEmitter Latency (us)': tinyEmitterStr,
     };
 
     results.push(results_row);
   }
 
-  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'EventTarget Latency (us)'], results);
+  printTable('Emission Latency Benchmark', ['Count', 'Dispatcher Latency (us)', 'EventTarget Latency (us)', 'TinyEmitter Latency (us)'], results);
 }
 
 export { runEmissionLatencyBenchmark };
