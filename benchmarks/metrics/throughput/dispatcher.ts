@@ -2,9 +2,9 @@ import { measure } from '../../utils/runner.ts';
 import { EventDispatcher } from '../../../index.ts';
 
 type MyEvents = {
-  event1: [string];
-  event2: [string, string, string];
-  event3: [string, string, string, string, string];
+  event1: (a: string) => void;
+  event2: (a: string, b: string, c: string) => void;
+  event3: (a: string, b: string, c: string, d: string, e: string) => void;
 };
 
 /**

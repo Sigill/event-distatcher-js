@@ -1,8 +1,10 @@
-export interface EventMap {
-  [eventName: string]: Array<unknown>;
+export type EventMap<L> = {
+  [E in keyof L]: (...args: any[]) => void;
 };
 
-export type EventListener<Data extends Array<unknown>> = (...data: Data) => void;
+export type DefaultListener = {
+  [k: string]: (...args: unknown[]) => void;
+};
 
 /**
  * EventDispatcher class
@@ -16,34 +18,34 @@ export type EventListener<Data extends Array<unknown>> = (...data: Data) => void
  * @example
  * ```typescript
  * type Events = {
- *   'event1': [string];
- *   'event2': [number, string];
+ *   'event1': (a: string) => void;
+ *   'event2': (a: number, b: string) => void;
  * };
  *
  * const dispatcher = new EventDispatcher<Events>();
  *
- * dispatcher.addEventListener('event1', (data) => {
- *   console.log(data);
+ * dispatcher.addEventListener('event1', (a) => {
+ *   console.log(a);
  * });
  *
  * dispatcher.dispatchEvent('event1', 'hello');
  * ```
  */
-export class EventDispatcher<Events extends EventMap> {
+export class EventDispatcher<Events extends EventMap<Events> = DefaultListener> {
   #listeners: {
-    [K in keyof Events]?: Array<EventListener<Events[K]>>;
+    [EventName in keyof Events]?: Array<Events[EventName]>;
   } = {};
 
   addEventListener<EventName extends keyof Events>(
     eventName: EventName,
-    listener: EventListener<Events[EventName]>
+    listener: Events[EventName]
   ) {
     (this.#listeners[eventName] ??= []).push(listener);
   }
 
   removeEventListener<EventName extends keyof Events>(
     eventName: EventName,
-    listener: EventListener<Events[EventName]>
+    listener: Events[EventName]
   ) {
     if (this.#listeners[eventName] !== undefined) {
       const index = this.#listeners[eventName].indexOf(listener);
@@ -55,7 +57,7 @@ export class EventDispatcher<Events extends EventMap> {
 
   dispatchEvent<EventName extends keyof Events>(
     eventName: EventName,
-    ...data: Events[EventName]
+    ...data: Parameters<Events[EventName]>
   ) {
     if (this.#listeners[eventName] !== undefined) {
       for (const listener of this.#listeners[eventName]) {

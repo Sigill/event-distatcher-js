@@ -2,8 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { EventDispatcher } from './index.ts';
 
 type MyEvents = {
-  'test-event': [string];
-  'numeric-event': [number, number];
+  'test-event': (a: string) => void;
+  'numeric-event': (a: number, b: number) => void;
 };
 
 describe('EventDispatcher', () => {

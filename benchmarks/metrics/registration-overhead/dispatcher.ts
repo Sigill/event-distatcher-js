@@ -2,7 +2,7 @@ import { measureAverage } from '../../utils/runner.ts';
 import { EventDispatcher } from '../../../index.ts';
 
 type MyEvents = {
-  message: [];
+  message: () => void;
 };
 
 /**
